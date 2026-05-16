@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="https://cdn.jsdelivr.net/gh/Coderandhacker69/youtube-playables-scraped@main/" />
     <title>YouTube Playables Scraped</title>
     <style>
       :root {
@@ -259,15 +258,24 @@
       async function loadData() {
         statusEl.textContent = 'Loading data...';
         gridEl.innerHTML = '';
-        try {
-          const response = await fetch('youtube_playables_scraped.json');
-          if (!response.ok) {
-            throw new Error(`${response.status} ${response.statusText}`);
+
+        const localUrl = './youtube_playables_scraped.json';
+        const cdnUrl = 'https://cdn.jsdelivr.net/gh/CoderandHacker69/youtube-playables-scraper@main/youtube_playables_scraped.json';
+
+        for (const url of [localUrl, cdnUrl]) {
+          try {
+            const response = await fetch(url);
+            if (!response.ok) {
+              throw new Error(`${response.status} ${response.statusText}`);
+            }
+            items = await response.json();
+            renderCards(items);
+            return;
+          } catch (error) {
+            if (url === cdnUrl) {
+              statusEl.textContent = `Failed to load JSON file: ${error.message}`;
+            }
           }
-          items = await response.json();
-          renderCards(items);
-        } catch (error) {
-          statusEl.textContent = `Failed to load JSON file: ${error.message}`;
         }
       }
 
